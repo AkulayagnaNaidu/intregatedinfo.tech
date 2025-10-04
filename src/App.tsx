@@ -8,6 +8,19 @@ import FooterSection from './components/FooterSection';
 function App() {
   const [showResumeModal, setShowResumeModal] = useState(false);
   const [showMockInterviewModal, setShowMockInterviewModal] = useState(false);
+
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const navbarHeight = 100; // Fixed navbar height + padding
+      const elementPosition = element.offsetTop - navbarHeight;
+      
+      window.scrollTo({
+        top: elementPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
   const [resumeFormData, setResumeFormData] = useState({
     name: '',
     mobile: '',
@@ -225,28 +238,25 @@ The candidate has requested to schedule a mock interview. Please contact them to
           Learning is a Journey...<br />Not a Destination.
         </h1>
           <div className="d-flex justify-content-center mb-4">
-            <a
-              href="#"
+            <button
+              onClick={() => scrollToSection('courses-section')}
               className="btn btn-lg"
               style={{
                 background: '#fff',
                 border: 'none',
                 fontWeight: 'bold',
                 fontSize: '1.3rem',
-                color: 'transparent',
-                backgroundClip: 'padding-box',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundImage: 'linear-gradient(90deg, #f7f6f2ff 60%, #FF1744 100%)',
+                color: '#0e0d0dff',
                 boxShadow: '0 2px 8px rgba(226, 223, 223, 0.08)',
                 padding: '0.7em 2em',
                 borderRadius: '0.5em',
                 letterSpacing: '1px',
-                transition: 'box-shadow 0.2s'
+                transition: 'box-shadow 0.2s',
+                cursor: 'pointer'
               }}
             >
-              Enroll Now
-            </a>
+              Enroll Now 
+            </button>
           </div>
         <div className="row mt-5 justify-content-center">
           {[{num:'100%', label:'Success Rate'}, {num:'100+', label:'Faculties'}, {num:'20000+', label:'Students'}, {num:'75+', label:'Courses'}].map((stat, idx) => (

@@ -65,14 +65,25 @@ const Navbar: React.FC = () => {
           className="navbar-brand fw-bold d-flex align-items-center" 
           onClick={scrollToTop}
           style={{
-            fontSize: '2rem', 
+            fontSize: '1.8rem', 
             background: 'none', 
             border: 'none', 
             cursor: 'pointer',
-            textDecoration: 'none'
+            textDecoration: 'none',
+            padding: '0.5rem 0'
           }}
         >
-          <img src="/logo.png" style={{height:32, marginRight:8}} />
+          <img 
+            src="/n.png" 
+            alt="IntegratedInfoTech Logo"
+            style={{
+              height: 40, 
+              width: 40,
+              marginRight: 12,
+              borderRadius: '6px',
+              boxShadow: '0 2px 8px rgba(255, 214, 0, 0.3)'
+            }} 
+          />
           <span style={{
             background: 'linear-gradient(90deg, #FFD600 60%, #FF1744 100%)',
             WebkitBackgroundClip: 'text',

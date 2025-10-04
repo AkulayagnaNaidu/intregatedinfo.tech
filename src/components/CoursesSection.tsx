@@ -6,7 +6,7 @@ const courses = [
     img: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg',
     details: {
       duration: '6 Months',
-      mode: 'Online & Offline',
+      mode: 'Online ',
       certification: 'Industry Recognized Certificate',
       fee: '₹15,000',
       description: 'Master both frontend and backend development with comprehensive training in modern web technologies, version control systems, and collaborative tools.',
@@ -43,8 +43,8 @@ const courses = [
     name: 'iOS Developer', 
     img: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/apple/apple-original.svg',
     details: {
-      duration: '5 Months',
-      mode: 'Online & Offline',
+      duration: '3 Months',
+      mode: 'Online ',
       certification: 'Apple Certified Developer',
       fee: '₹15,000',
       description: 'Learn to build native iOS applications using Swift and Objective-C with professional development tools and collaboration platforms.',
@@ -84,7 +84,7 @@ const courses = [
     img: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg',
     details: {
       duration: '4 Months',
-      mode: 'Online & Offline',
+      mode: 'Online ',
       certification: 'React Native Certificate',
       fee: '₹15,000',
       description: 'Build cross-platform mobile applications using React Native framework with modern development tools and team collaboration systems.',
@@ -136,10 +136,22 @@ const CoursesSection: React.FC = () => {
     course: '',
     fee: ''
   });
+  const [emailError, setEmailError] = useState('');
+  const [phoneError, setPhoneError] = useState('');
 
   const handleCourseClick = (course: any) => {
     setSelectedCourse(course);
     setShowModal(true);
+  };
+
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePhone = (phone: string) => {
+    const phoneRegex = /^[0-9]{10}$/;
+    return phoneRegex.test(phone);
   };
 
   const handleEnrollClick = (course: any) => {
@@ -156,13 +168,54 @@ const CoursesSection: React.FC = () => {
   const handleEnrollmentInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setEnrollmentData(prev => ({ ...prev, [name]: value }));
+    
+    // Real-time validation
+    if (name === 'email') {
+      if (value === '') {
+        setEmailError('');
+      } else if (!validateEmail(value)) {
+        setEmailError('Please enter a valid email address (e.g., user@example.com)');
+      } else {
+        setEmailError('');
+      }
+    }
+    
+    if (name === 'phone') {
+      if (value === '') {
+        setPhoneError('');
+      } else if (!validatePhone(value)) {
+        setPhoneError('Please enter a valid 10-digit phone number');
+      } else {
+        setPhoneError('');
+      }
+    }
   };
 
   const handleProceedToPayment = () => {
-    if (!enrollmentData.name || !enrollmentData.email || !enrollmentData.phone) {
+    // Reset any previous errors
+    setEmailError('');
+    setPhoneError('');
+    
+    // Check if all fields are filled
+    if (!enrollmentData.name.trim() || !enrollmentData.email.trim() || !enrollmentData.phone.trim()) {
       alert('Please fill all required fields');
       return;
     }
+    
+    // Validate email
+    if (!validateEmail(enrollmentData.email)) {
+      setEmailError('Please enter a valid email address (e.g., user@example.com)');
+      alert('Please enter a valid email address');
+      return;
+    }
+    
+    // Validate phone
+    if (!validatePhone(enrollmentData.phone)) {
+      setPhoneError('Please enter a valid 10-digit phone number');
+      alert('Please enter a valid 10-digit phone number');
+      return;
+    }
+    
     setShowEnrollmentModal(false);
     setShowPaymentModal(true);
   };
@@ -171,10 +224,9 @@ const CoursesSection: React.FC = () => {
     setPaymentSuccess(true);
     setShowPaymentModal(false);
     
-    // After 2 seconds, redirect to Google Form
+    // After 3 seconds, redirect to Google Form
     setTimeout(() => {
-      // Replace this URL with your actual Google Form URL
-      const googleFormURL = 'https://forms.google.com/your-form-url-here';
+      const googleFormURL = 'https://docs.google.com/forms/d/e/1FAIpQLSdqVlounarOSUxlUmLvc_aPsHNbAimdP0Mi3b_PEOf63wDnJw/viewform?usp=header';
       window.open(googleFormURL, '_blank');
       
       // Reset all states
@@ -186,7 +238,9 @@ const CoursesSection: React.FC = () => {
         course: '',
         fee: ''
       });
-    }, 2000);
+      setEmailError('');
+      setPhoneError('');
+    }, 3000);
   };
 
   return (
@@ -459,32 +513,64 @@ const CoursesSection: React.FC = () => {
                     <label htmlFor="enrollEmail" className="form-label fw-bold">Email Address <span style={{color: '#FF1744'}}>*</span></label>
                     <input
                       type="email"
-                      className="form-control"
+                      className={`form-control ${emailError ? 'is-invalid' : enrollmentData.email && !emailError ? 'is-valid' : ''}`}
                       id="enrollEmail"
                       name="email"
                       value={enrollmentData.email}
                       onChange={handleEnrollmentInputChange}
                       required
-                      placeholder="Enter your email address"
-                      style={{borderRadius: '8px', border: '2px solid #e0e0e0', padding: '10px'}}
+                      placeholder="Enter your email address (e.g., user@example.com)"
+                      style={{
+                        borderRadius: '8px', 
+                        border: emailError ? '2px solid #dc3545' : enrollmentData.email && !emailError ? '2px solid #28a745' : '2px solid #e0e0e0', 
+                        padding: '10px'
+                      }}
                     />
+                    {emailError && (
+                      <div className="invalid-feedback d-block" style={{fontSize: '0.875rem', color: '#dc3545'}}>
+                        <i className="bi bi-exclamation-circle me-1"></i>
+                        {emailError}
+                      </div>
+                    )}
+                    {enrollmentData.email && !emailError && (
+                      <div className="valid-feedback d-block" style={{fontSize: '0.875rem', color: '#28a745'}}>
+                        <i className="bi bi-check-circle me-1"></i>
+                        Valid email address
+                      </div>
+                    )}
                   </div>
 
                   <div className="mb-4">
                     <label htmlFor="enrollPhone" className="form-label fw-bold">Phone Number <span style={{color: '#FF1744'}}>*</span></label>
                     <input
                       type="tel"
-                      className="form-control"
+                      className={`form-control ${phoneError ? 'is-invalid' : enrollmentData.phone && !phoneError ? 'is-valid' : ''}`}
                       id="enrollPhone"
                       name="phone"
                       value={enrollmentData.phone}
                       onChange={handleEnrollmentInputChange}
                       required
-                      placeholder="Enter your phone number"
+                      placeholder="Enter your 10-digit phone number"
                       pattern="[0-9]{10}"
                       maxLength={10}
-                      style={{borderRadius: '8px', border: '2px solid #e0e0e0', padding: '10px'}}
+                      style={{
+                        borderRadius: '8px', 
+                        border: phoneError ? '2px solid #dc3545' : enrollmentData.phone && !phoneError ? '2px solid #28a745' : '2px solid #e0e0e0', 
+                        padding: '10px'
+                      }}
                     />
+                    {phoneError && (
+                      <div className="invalid-feedback d-block" style={{fontSize: '0.875rem', color: '#dc3545'}}>
+                        <i className="bi bi-exclamation-circle me-1"></i>
+                        {phoneError}
+                      </div>
+                    )}
+                    {enrollmentData.phone && !phoneError && (
+                      <div className="valid-feedback d-block" style={{fontSize: '0.875rem', color: '#28a745'}}>
+                        <i className="bi bi-check-circle me-1"></i>
+                        Valid phone number
+                      </div>
+                    )}
                   </div>
                 </form>
               </div>
@@ -532,8 +618,8 @@ const CoursesSection: React.FC = () => {
             <div className="modal-content" style={{borderRadius: '15px', border: 'none'}}>
               <div className="modal-header" style={{background: 'linear-gradient(90deg, #28a745, #20c997)', borderRadius: '15px 15px 0 0'}}>
                 <h5 className="modal-title fw-bold" style={{color: '#fff'}}>
-                  <i className="bi bi-credit-card me-2"></i>
-                  Payment Details
+                  <i className="bi bi-phone me-2"></i>
+                  UPI Payment
                 </h5>
                 <button 
                   type="button" 
@@ -556,39 +642,44 @@ const CoursesSection: React.FC = () => {
                   </div>
                   
                   <div className="col-md-6">
-                    <h6 className="fw-bold mb-3">Payment Options</h6>
-                    <div className="d-grid gap-2">
-                      <button 
-                        className="btn btn-outline-primary"
-                        onClick={handlePaymentSuccess}
-                        style={{borderRadius: '10px', padding: '12px'}}
-                      >
-                        <i className="bi bi-credit-card me-2"></i>
-                        Pay with Card
-                      </button>
-                      <button 
-                        className="btn btn-outline-success"
-                        onClick={handlePaymentSuccess}
-                        style={{borderRadius: '10px', padding: '12px'}}
-                      >
-                        <i className="bi bi-phone me-2"></i>
-                        UPI Payment
-                      </button>
-                      <button 
-                        className="btn btn-outline-info"
-                        onClick={handlePaymentSuccess}
-                        style={{borderRadius: '10px', padding: '12px'}}
-                      >
-                        <i className="bi bi-bank me-2"></i>
-                        Net Banking
-                      </button>
+                    <h6 className="fw-bold mb-3">Payment Details</h6>
+                    <div className="card border-0" style={{backgroundColor: '#e8f5e8', borderRadius: '10px', border: '2px solid #28a745'}}>
+                      <div className="card-body text-center">
+                        <h6 className="fw-bold text-success mb-2">
+                          <i className="bi bi-phone me-2"></i>
+                          UPI Payment Only
+                        </h6>
+                        <div className="mb-3">
+                          <small className="text-muted d-block">Pay to UPI ID:</small>
+                          <div 
+                            className="p-2 bg-white rounded border"
+                            style={{fontFamily: 'monospace', fontSize: '1rem', fontWeight: 'bold', color: '#28a745'}}
+                          >
+                            8328418521-2@ybl
+                          </div>
+                        </div>
+                        <button 
+                          className="btn btn-success w-100"
+                          onClick={handlePaymentSuccess}
+                          style={{borderRadius: '10px', padding: '12px', fontWeight: 'bold'}}
+                        >
+                          <i className="bi bi-check-circle me-2"></i>
+                          I have completed the payment
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
                 
-                <div className="alert alert-warning mt-3" style={{borderRadius: '10px'}}>
-                  <i className="bi bi-exclamation-triangle me-2"></i>
-                  <strong>Note:</strong> This is a demo payment interface. In production, integrate with actual payment gateways like Razorpay, Stripe, or PayPal.
+                <div className="alert alert-warning mt-3" style={{borderRadius: '12px', padding: '1rem', fontSize: '1.1rem', fontWeight: '500', border: '2px solid #ffc107'}}>
+                  <i className="bi bi-exclamation-triangle-fill text-warning me-2" style={{fontSize: '1.3rem'}}></i>
+                  <strong style={{fontSize: '1.2rem'}}>IMPORTANT NOTICE:</strong> 
+                  <div style={{fontSize: '1rem', marginTop: '0.5rem', lineHeight: '1.5'}}>
+                    ✅ Pay ONLY to UPI ID: <strong>8328418521-2@ybl</strong><br/>
+                    ✅ After payment, click confirmation button above<br/>
+                    ✅ Our team will verify payment within 24 hours<br/>
+                    ✅ Keep payment screenshot ready for verification
+                  </div>
                 </div>
               </div>
             </div>
@@ -608,15 +699,19 @@ const CoursesSection: React.FC = () => {
                 <div className="mb-4">
                   <i className="bi bi-check-circle-fill text-success" style={{fontSize: '4rem'}}></i>
                 </div>
-                <h4 className="fw-bold text-success mb-3">Payment Successful!</h4>
+                <h4 className="fw-bold text-success mb-3">Payment Confirmed!</h4>
                 <p className="text-muted mb-4">
                   Thank you for enrolling in <strong>{selectedCourse?.name}</strong>. 
-                  <br />You will be redirected to complete your registration form.
+                  <br />Our team will contact you soon. You will be redirected to complete a Google Form for final details.
                 </p>
+                <div className="alert alert-info" style={{borderRadius: '10px'}}>
+                  <i className="bi bi-info-circle me-2"></i>
+                  <strong>Next Step:</strong> Please fill the Google Form that will open in a new tab.
+                </div>
                 <div className="spinner-border text-primary" role="status">
                   <span className="visually-hidden">Loading...</span>
                 </div>
-                <p className="mt-2 text-muted">Redirecting to registration form...</p>
+                <p className="mt-2 text-muted">Redirecting to Google Form...</p>
               </div>
             </div>
           </div>
